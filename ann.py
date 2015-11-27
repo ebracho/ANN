@@ -8,7 +8,7 @@ def sigmoid(x, deriv=False):
 class ANN:
 
     # Fresh neural network
-    def __init__(self, inp_dim, out_dim, hid_dim=None, syn0=None, syn1=None):
+    def __init__(self, inp_dim, out_dim, hid_dim, syn0=None, syn1=None):
         if syn0 != None and syn1 != None:
             self.syn0, self.syn1 = syn0, syn1
         else:
