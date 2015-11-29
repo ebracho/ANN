@@ -5,10 +5,12 @@ from ann import ANN
 from PIL import Image
 import os
 for dir_num in range(0, 2):
+    #if dir_num == 0:
+     #   dir = "images/clarinet_50"
     if dir_num == 0:
-        dir = "images/clarinet_50"
-    elif dir_num == 1:
         dir = "images/trumpet_50"
+    elif dir_num == 1:
+        dir = "images/violin_50"
     num = 0
     for file in os.listdir(dir):
         im = Image.open(os.path.join(dir, file))
@@ -19,7 +21,7 @@ for dir_num in range(0, 2):
             for j in range(0, 25):
                 RGB = pix[i, j]
                 R, G, B = RGB
-                if R < white or G < white or B < white:
+                if R <white or G <white or B <white:
                     pix_count += 1
         a = float(pix_count) / 1250
         pix_count = 0
@@ -36,13 +38,14 @@ for dir_num in range(0, 2):
             y = np.array([[0]])
         else:
             arr = np.vstack((arr, d))
-            y = np.append(y, [[dir_num]])
+            if dir_num == 1 or dir_num == 0:
+                y = np.append(y, [[dir_num]])
+            elif dir_num == 2:
+                y = np.append(y, [[0.5]])
         num += 1
-ann = ANN(2, 1,4)
+ann = ANN(2,16,1, alpha=.5)
 y = np.array(y, ndmin=2).T
-ann.train(arr, y, iterations=10000)
+ann.train(arr, y, iterations=60000)
 for i in range(0, y.size):
-    print (i, ann.evaluate(arr[i]), y[i])
-
-
-ann.write_to_file('xor_ann')
+    out=ann.estimate(arr[i])
+    print(i, out, y[i])
