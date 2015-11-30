@@ -9,10 +9,10 @@ TUBA_CLASSIFIER = [0,0,1,0,0]
 FLUTE_CLASSIFIER = [0,0,0,1,0]
 CLARINET_CLASSIFIER = [0,0,0,0,1]
 
-# Fits an Image object to 50x50 and greyscales
+# Fits an Image object to 28x28 and grayscales
 def format_image(im):
-    converted_im = ImageOps.fit(im, (50,50), Image.ANTIALIAS, centering=(0.5,0.5)).convert('RGB').getdata()
-    return [val for pixel in converted_im for val in pixel]
+    pixels = ImageOps.fit(im,(40,40)).convert('RGB').getdata()
+    return [val for rgb in pixels for val in rgb]
 
 def format_img_from_url(url):
     img_data = urllib.urlopen(url).read()
@@ -24,8 +24,15 @@ def format_img_from_file(filepath):
         im = Image.open(StringIO(f.read()))
         return format_image(im)
 
-# inp = format_img_from_url('http://www.amromusic.com/assets/1942/7_trumpet-1.jpg')
-inp = format_img_from_file('image_search/images/original/violin0')
+def classify(estimate):
+    total = sum(estimate)
+    print "Violin:   %s%%" % str(estimate[0]/total)
+    print "Trumpet:  %s%%" % str(estimate[1]/total)
+    print "Tuba:     %s%%" % str(estimate[2]/total)
+    print "Flute:    %s%%" % str(estimate[3]/total)
+    print "Clarinet: %s%%" % str(estimate[4]/total)
 
+inp = format_img_from_url('http://www.southernwinds.ca/images/Tuba.jpg')
+# inp = format_img_from_file('image_search/images/resized/tuba/tuba53.bmp')
 ann = ANN.from_file('instrument_ann.npz')
-print ann.estimate(inp)
+classify(ann.estimate(inp))
