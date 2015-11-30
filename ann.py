@@ -21,6 +21,7 @@ class ANN:
         self.alpha = alpha
         self.l0_bias = np.ones(inp_dim)
         self.l1_bias = np.ones(hid_dim)
+        self.total_iterations = 0
 
     @classmethod
     def from_file(cls, filename):
@@ -30,7 +31,8 @@ class ANN:
             obj.syn1 = data['syn1']
             obj.alpha = data['alpha']
             obj.l0_bias = data['l0_bias']
-            obj_l1_bias = data['l1_bias']
+            obj.l1_bias = data['l1_bias']
+            obj.total_iterations = data['total_iterations']
         return obj
         
     # Propagate inp forward through the ann and return output
@@ -66,9 +68,11 @@ class ANN:
         error = []
         for data in training_set:
             error.append(abs(self.train(data)))
+        self.total_iterations += 1
         return np.mean(error)
 
     # Writes network to a file
     def write_to_file(self, filename):
         np.savez(filename, syn0=self.syn0, syn1=self.syn1, alpha=self.alpha, 
-                 l0_bias=self.l0_bias, l1_bias=self.l1_bias)
+                 l0_bias=self.l0_bias, l1_bias=self.l1_bias, 
+                 total_iterations=self.total_iterations)
