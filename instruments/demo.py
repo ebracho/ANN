@@ -11,8 +11,9 @@ CLARINET_CLASSIFIER = [0,0,0,0,1]
 
 # Fits an Image object to 28x28 and grayscales
 def format_image(im):
-    pixels = ImageOps.fit(im,(40,40)).convert('RGB').getdata()
-    return [val for rgb in pixels for val in rgb]
+    pixels = ImageOps.fit(im,(40,40)).convert('L').getdata()
+    return pixels
+    # return [val for rgb in pixels for val in rgb]
 
 def format_img_from_url(url):
     img_data = urllib.urlopen(url).read()
@@ -26,13 +27,31 @@ def format_img_from_file(filepath):
 
 def classify(estimate):
     total = sum(estimate)
+    """
     print "Violin:   %s%%" % str(estimate[0]/total)
     print "Trumpet:  %s%%" % str(estimate[1]/total)
     print "Tuba:     %s%%" % str(estimate[2]/total)
     print "Flute:    %s%%" % str(estimate[3]/total)
     print "Clarinet: %s%%" % str(estimate[4]/total)
+    """
+    print estimate
+    print "Violin:   %s%%" % str(100*estimate[0]/total)
+    print "Trumpet:  %s%%" % str(100*estimate[1]/total)
+    print "Tuba:     %s%%" % str(100*estimate[2]/total)
+    print "Clarinet: %s%%" % str(100*estimate[3]/total)
 
-inp = format_img_from_url('http://www.southernwinds.ca/images/Tuba.jpg')
-# inp = format_img_from_file('image_search/images/resized/tuba/tuba53.bmp')
+method = sys.argv[1]
+source = sys.argv[2]
+
+if method == 'url':
+    inp = format_img_from_url(source)
+
+elif method == 'filepath':
+    inp = format_img_from_file(source)
+
+else:
+    print "bad input"
+    sys.exit(1)
+
 ann = ANN.from_file('instrument_ann.npz')
 classify(ann.estimate(inp))

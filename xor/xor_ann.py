@@ -20,7 +20,7 @@ training_set = [ ([0,0],[0]),
 ann = ANN(2,3,1,alpha=1)
 
 # Run the network through 1000 iterations of the training set
-error_data = [ann.train_set(training_set) for _ in range(1000)]
+error_data = [ann.train_set(training_set) for _ in range(2000)]
 
 # Plot the mean error for each iteration
 plot_error(error_data)

@@ -19,8 +19,6 @@ class ANN:
         self.syn0 = np.random.random((inp_dim+1, hid_dim)) - 0.5
         self.syn1 = np.random.random((hid_dim+1, out_dim)) - 0.5
         self.alpha = alpha
-        self.l0_bias = np.ones(inp_dim)
-        self.l1_bias = np.ones(hid_dim)
         self.total_iterations = 0
 
     @classmethod
@@ -30,8 +28,6 @@ class ANN:
             obj.syn0 = data['syn0']
             obj.syn1 = data['syn1']
             obj.alpha = data['alpha']
-            obj.l0_bias = data['l0_bias']
-            obj.l1_bias = data['l1_bias']
             obj.total_iterations = data['total_iterations']
         return obj
         
@@ -74,5 +70,5 @@ class ANN:
     # Writes network to a file
     def write_to_file(self, filename):
         np.savez(filename, syn0=self.syn0, syn1=self.syn1, alpha=self.alpha, 
-                 l0_bias=self.l0_bias, l1_bias=self.l1_bias, 
                  total_iterations=self.total_iterations)
+
