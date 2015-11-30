@@ -1,17 +1,38 @@
 import numpy as np
 
+@np.vectorize
 def sigmoid(x, deriv=False):
-    return x*(1-x) if deriv else 1/(1+np.exp(-x))
+    if deriv: 
+        return x*(1-x)
+    else:
+        # Catch large x values to avoid overflow
+        if x > 100:
+            return 1
+        if x < -100:
+            return 0
+        else:
+            return 1/(1+np.exp(-x))
 
 # Artificial Neural Network with one hidden layer
 class ANN:
-    def __init__(self, inp_dim, hid_dim, out_dim, alpha=1):
-        self.syn0 = np.random.random((inp_dim+1, hid_dim))
-        self.syn1 = np.random.random((hid_dim+1, out_dim))
+    def __init__(self, inp_dim, hid_dim, out_dim, alpha=0.01):
+        self.syn0 = np.random.random((inp_dim+1, hid_dim)) - 0.5
+        self.syn1 = np.random.random((hid_dim+1, out_dim)) - 0.5
         self.alpha = alpha
         self.l0_bias = np.ones(inp_dim)
         self.l1_bias = np.ones(hid_dim)
 
+    @classmethod
+    def from_file(cls, filename):
+        obj = cls(1,1,1)
+        with np.load(filename) as data:
+            obj.syn0 = data['syn0']
+            obj.syn1 = data['syn1']
+            obj.alpha = data['alpha']
+            obj.l0_bias = data['l0_bias']
+            obj_l1_bias = data['l1_bias']
+        return obj
+        
     # Propagate inp forward through the ann and return output
     def estimate(self, inp):
         l0 = np.concatenate((inp, [1]))
@@ -21,7 +42,8 @@ class ANN:
         return l2
 
     # Train synapses using Backpropagation Algorithm 
-    def train(self, inp, out):
+    def train(self, data):
+        inp, out = data
         # Compute output using forward propagation
         l0 = np.concatenate((inp, [1]))
         l1 = sigmoid(np.dot(l0, self.syn0)) 
@@ -37,12 +59,16 @@ class ANN:
         self.syn1 += self.alpha * np.outer(l1.T, l2_error)
         self.syn0 += self.alpha * np.outer(l0.T, l1_error[:-1])
 
-        return l2_error
+        return (out - l2)
 
     # Trains neural network from a set. Yields error after each iteration
-    def train_set(self, inp_set, out_set, iterations=1):
-        for i in range(iterations):
-            errors = []
-            for inp, out in zip(inp_set, out_set):
-                errors.append(abs(self.train(inp, out)))
-            yield np.mean(errors)
+    def train_set(self, training_set):
+        error = []
+        for data in training_set:
+            error.append(abs(self.train(data)))
+        return np.mean(error)
+
+    # Writes network to a file
+    def write_to_file(self, filename):
+        np.savez(filename, syn0=self.syn0, syn1=self.syn1, alpha=self.alpha, 
+                 l0_bias=self.l0_bias, l1_bias=self.l1_bias)
