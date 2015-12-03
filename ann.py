@@ -13,6 +13,9 @@ def sigmoid(x, deriv=False):
         else:
             return 1/(1+np.exp(-x))
 
+def euclidean_distance(a, b):
+    return np.linalg.norm(a-b)
+
 # Artificial Neural Network with one hidden layer
 class ANN:
     def __init__(self, inp_dim, hid_dim, out_dim, alpha=0.01):
@@ -57,18 +60,17 @@ class ANN:
         self.syn1 += self.alpha * np.outer(l1.T, l2_error)
         self.syn0 += self.alpha * np.outer(l0.T, l1_error[:-1])
 
-        return (out - l2)
+        return euclidean_distance(out, l2)
 
     # Trains neural network from a set. Yields error after each iteration
     def train_set(self, training_set):
         error = []
         for data in training_set:
-            error.append(abs(self.train(data)))
+            error.append(self.train(data))
         self.total_iterations += 1
-        return np.mean(error)
+        return error
 
     # Writes network to a file
     def write_to_file(self, filename):
         np.savez(filename, syn0=self.syn0, syn1=self.syn1, alpha=self.alpha, 
                  total_iterations=self.total_iterations)
-

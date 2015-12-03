@@ -34,7 +34,6 @@ def classify(estimate):
     print "Flute:    %s%%" % str(estimate[3]/total)
     print "Clarinet: %s%%" % str(estimate[4]/total)
     """
-    print estimate
     print "Violin:   %s%%" % str(100*estimate[0]/total)
     print "Trumpet:  %s%%" % str(100*estimate[1]/total)
     print "Tuba:     %s%%" % str(100*estimate[2]/total)

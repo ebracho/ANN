@@ -5,8 +5,6 @@ sys.path.append('../')
 from ann import ANN
 
 def plot_error(data):
-    plt.xlabel('Iterations')
-    plt.ylabel('Mean Error')
     plt.plot(data)
     plt.show()
 
@@ -23,5 +21,17 @@ ann = ANN(2,3,1,alpha=1)
 error_data = [ann.train_set(training_set) for _ in range(2000)]
 
 # Plot the mean error for each iteration
-plot_error(error_data)
+none, left, right, both = zip(*error_data)
+
+none_line, = plt.plot(none)
+left_line, = plt.plot(left)
+right_line, = plt.plot(right)
+both_line, = plt.plot(both)
+
+plt.legend([none_line, left_line, right_line, both_line], ['[0,0]', '[1,0]', '[0,1]', '[1,1]'])
+
+plt.xlabel('Iterations')
+plt.ylabel('Error')
+
+plt.show()
 
