@@ -45,20 +45,24 @@ class ANN:
     # Train synapses using Backpropagation Algorithm 
     def train(self, data):
         inp, out = data
+
         # Compute output using forward propagation
-        l0 = np.concatenate((inp, [1]))
-        l1 = sigmoid(np.dot(l0, self.syn0)) 
-        l1 = np.concatenate((l1, [1]))
-        l2 = sigmoid(np.dot(l1, self.syn1)) 
+        l0 = np.concatenate((inp, [1])) # Append 1 to input layer for bias 
+        l1 = sigmoid(np.dot(l0, self.syn0)) # Pass through syn0 and activate
+        l1 = np.concatenate((l1, [1])) # Append 1 to hidden layer for bias
+        l2 = sigmoid(np.dot(l1, self.syn1)) # Pass through syn1 and activate
         
-        # Compute error using backpropagation
+        # Compute error using backpropagation. This is achieved by passing 
+        # error vectors through the transpose of the synapse matrices. Note 
+        # that we need to remove l1's bias node for the matrices to align.
         l2_error = (out - l2) * sigmoid(l2, deriv=True)
         l1_error = np.dot(l2_error, self.syn1.T) * sigmoid(l1, deriv=True)
-        l0_error = np.dot(l1_error[:-1], self.syn0.T) * sigmoid(l0, deriv=True)
+        l1_error = l1_error[:-1]
+        l0_error = np.dot(l1_error, self.syn0.T) * sigmoid(l0, deriv=True)
 
         # Adjust synapses according to error and learning rate
         self.syn1 += self.alpha * np.outer(l1.T, l2_error)
-        self.syn0 += self.alpha * np.outer(l0.T, l1_error[:-1])
+        self.syn0 += self.alpha * np.outer(l0.T, l1_error)
 
         return euclidean_distance(out, l2)
 
